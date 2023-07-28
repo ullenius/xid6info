@@ -88,9 +88,7 @@ inline uint32_t parse_u32(const uint8_t *src) {
 void parse_xid6( struct binary_file *spc ) {
     struct xid6 tags = { 0 };
     uint8_t *len = &spc->data[ XID6_OFFSET + 4 ];
-    uint32_t chunk_size = len[0] | len[1] << 8 | len[2] << 16 | len[3] << 24;
-
-    printf("chunk size: %d\n", chunk_size );
+    const uint32_t chunk_size = len[0] | len[1] << 8 | len[2] << 16 | len[3] << 24;
 
     size_t offset = XID6_OFFSET + XID6_HEADER_LENGTH;
     while ( offset < ( XID6_OFFSET + XID6_HEADER_LENGTH + chunk_size) ) {
@@ -169,18 +167,20 @@ void parse_xid6( struct binary_file *spc ) {
     if (tags.ost_disc) {
         printf("OST disc: %d\n", tags.ost_disc );
     }
-    printf("Publishers name: %s\n", tags.publishers_name );
-    printf("Copyright year: %d\n", tags.copyright_year );
-    printf("Intro length: %#x\n", tags.intro_length );
-    printf("Loop length: %d\n", tags.loop_length );
-    printf("End length: %d\n", tags.end_length );
-    printf("Fade length: %d\n", tags.fade_length );
-    printf("Muted voices: %#x\n", tags.muted_voices );
-    printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
+    printf("Publishers name:       %s\n",       tags.publishers_name );
+    printf("Copyright year:        %d\n",       tags.copyright_year );
+    printf("Intro length:          %#4x\n",     tags.intro_length );
+    printf("Loop length:           %d\n",       tags.loop_length );
+    printf("End length:            %d\n",       tags.end_length );
+    printf("Fade length:           %d\n",       tags.fade_length );
+    // TODO print bits
+    printf("Muted voices:          %#02x\n",    tags.muted_voices );
+    printf("No. times to loop:     %d\n",       tags.number_of_times_to_loop );
     if (tags.ost_track) {
-        printf("OST track: %d %c\n", tags.ost_track >> 8, tags.ost_track & 0xFF );
+        printf("OST track:         %d %c\n",    tags.ost_track >> 8,
+            tags.ost_track & 0xFF );
     }
-    printf("Mixing (preamp) level: %#x\n", tags.mixing_level );
+    printf("Mixing (preamp) level: %#04x\n",    tags.mixing_level );
 
     if ( tags.publishers_name ) {
         free( tags.publishers_name );
