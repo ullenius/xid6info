@@ -96,10 +96,6 @@ void parse_xid6( struct binary_file *spc ) {
     while ( offset < ( XID6_OFFSET + XID6_HEADER_LENGTH + chunk_size) ) {
         uint8_t id = spc->data[ offset++ ];
         uint8_t type = spc->data[ offset++ ];
-        printf("id: %#x\n", id);
-        //printf("type: %d\n", type);
-        printf("stored in header: %d\n", type == 0);
-
     	uint16_t val = spc->data[ offset++];
     	val |= spc->data[offset++] << 8;           
 
@@ -149,17 +145,10 @@ void parse_xid6( struct binary_file *spc ) {
                 fprintf(stderr, "Unknown id: %#x\n", id);
                 exit(-1);
         }
-
-        if ( type == 0 ) {
-            printf("val stored in sub-chunk header: %d\n", val);
-        } else {
-            printf("increase offset by: %d\n", val); // TODO use hard-coded ?
+        if ( type ) { // value stored in sub-chunk header
             // 4-byte alignment of data
             uint8_t padding = (4 - (val % 4) ) % 4; // sub-chunk header is 4 bytes
-            if (padding) {
-                printf("extra padding: %d bytes\n", padding);
-            }
-            offset += val + padding;
+            offset += val + padding; // TODO use hard-coded values ?
         }
     }
 
