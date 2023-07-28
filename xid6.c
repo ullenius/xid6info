@@ -17,8 +17,11 @@ struct xid6 {
     uint32_t intro_length;
     uint32_t fade_length;
     uint8_t number_of_times_to_loop;
-    char *publishers_name;
+    char *song;
+    char *game;
     char *artist;
+    char *dumper;
+    char *publishers_name;
 };
 
 uint32_t parse_u32(const uint8_t*);
@@ -67,15 +70,24 @@ void parse_xid6( struct binary_file *spc ) {
         uint8_t id = spc->data[ offset++ ];
         uint8_t type = spc->data[ offset++ ];
         printf("id: %#x\n", id);
-        printf("type: %d\n", type);
+        //printf("type: %d\n", type);
         printf("stored in header: %d\n", type == 0);
 
     	uint16_t val = spc->data[ offset++];
     	val |= spc->data[offset++] << 8;           
 
         switch (id) {
+            case 0x1:
+                tags.song = allocate_copy( &spc->data[ offset ], val );
+                break;
+            case 0x2:
+                tags.game = allocate_copy( &spc->data[ offset ], val );
+                break;
             case 0x3:
                 tags.artist = allocate_copy( &spc->data[ offset ], val );
+                break;
+            case 0x4:
+                tags.dumper = allocate_copy( &spc->data[ offset ], val );
                 break;
             case 0x13:
                 tags.publishers_name = allocate_copy( &spc->data[ offset ], val ); 
@@ -93,6 +105,9 @@ void parse_xid6( struct binary_file *spc ) {
             case 0x35:
                 tags.number_of_times_to_loop = val;
                 break;
+            default:
+                fprintf(stderr, "Unknown id: %d\n", id);
+                exit(-1);
         }
 
         if ( type == 0 ) {
@@ -115,6 +130,12 @@ void parse_xid6( struct binary_file *spc ) {
         printf("artist: %s\n", tags.artist);
         free( tags.artist);
     }
+    if ( tags.game ) {
+        free( tags.game );
+    }
+    printf("Game name: %s\n", tags.game ? tags.game : "" );
+    printf("Song name: %s\n", tags.song ? tags.song : "" );
+    printf("Copyright year: %d\n", tags.copyright_year );
     printf("Intro length: %#x\n", tags.intro_length );
     printf("Fade length: %d\n", tags.fade_length );
     printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
