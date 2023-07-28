@@ -85,6 +85,12 @@ inline uint32_t parse_u32(const uint8_t *src) {
     return src[0] | src[1] << 8 | src[2] << 16 | src[3] << 24;
 }
 
+void free_ifpresent( void *target ) {
+    if ( target ) {
+        free ( target );
+    }
+}
+
 void parse_xid6( struct binary_file *spc ) {
     struct xid6 tags = { 0 };
     uint8_t *len = &spc->data[ XID6_OFFSET + 4 ];
@@ -182,27 +188,13 @@ void parse_xid6( struct binary_file *spc ) {
     }
     printf("Mixing (preamp) level: %#04x\n",    tags.mixing_level );
 
-    if ( tags.publishers_name ) {
-        free( tags.publishers_name );
-    }
-    if ( tags.artist ) {
-        free( tags.artist);
-    }
-    if ( tags.game ) {
-        free( tags.game );
-    }
-    if ( tags.song ) {
-        free( tags.song );
-    }
-    if ( tags.dumper ) {
-        free( tags.dumper );
-    }
-    if ( tags.comments ) {
-        free ( tags.comments );
-    }
-    if ( tags.ost_title ) {
-        free( tags.ost_title );
-    }
+    free_ifpresent( tags.publishers_name );
+    free_ifpresent( tags.artist );
+    free_ifpresent( tags.game );
+    free_ifpresent( tags.song );
+    free_ifpresent( tags.dumper );
+    free_ifpresent( tags.comments );
+    free_ifpresent( tags.ost_title );
 }
 
 struct binary_file *read_file(FILE *file) {
