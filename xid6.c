@@ -232,14 +232,20 @@ int main(int argc, char **argv) {
         return -1;
     }
     struct binary_file *spc = read_file( file );
-    printf("file size: %ld\n", spc->size );
-    printf("valid SPC header: %d\n", valid_spc( spc ) );
-    printf("valid xid6 header: %d\n", valid_xid6( spc ) );
-
+    if ( !valid_spc ( spc ) ) {
+        fprintf(stderr, "Not a valid SPC file\n");
+        free( spc->data );
+        free( spc );
+        return -1;
+    }
     if (valid_xid6 ( spc ) ) {
         parse_xid6( spc );
+    } else {
+        fprintf(stderr, "Unable to read xid6 tags\n");
+        free( spc->data );
+        free( spc );
+        return -1;
     }
-
     free( spc->data );
     free( spc );
 
