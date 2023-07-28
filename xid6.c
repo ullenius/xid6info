@@ -15,6 +15,7 @@ struct xid6 {
     uint32_t intro_length;
     uint32_t fade_length;
     uint8_t number_of_times_to_loop;
+    uint16_t ost_track;
     char *song;
     char *game;
     char *artist;
@@ -52,6 +53,10 @@ void set_fade_length( struct xid6 *tags, const uint8_t *src) {
     tags->fade_length = parse_u32( src );
 }
 
+void set_ost_track( struct xid6 *tags, const uint8_t *src) {
+    tags->ost_track = src[0] | src[1] << 8;
+}
+
 inline uint32_t parse_u32(const uint8_t *src) {
     return src[0] | src[1] << 8 | src[2] << 16 | src[3] << 24;
 }
@@ -87,6 +92,9 @@ void parse_xid6( struct binary_file *spc ) {
             case 0x4:
                 tags.dumper = allocate_copy( &spc->data[ offset ], val );
                 break;
+            case 0x12:
+                set_ost_track( &tags, &spc->data[ offset ] );
+                break;
             case 0x13:
                 tags.publishers_name = allocate_copy( &spc->data[ offset ], val ); 
                 break;
@@ -104,7 +112,7 @@ void parse_xid6( struct binary_file *spc ) {
                 tags.number_of_times_to_loop = val;
                 break;
             default:
-                fprintf(stderr, "Unknown id: %d\n", id);
+                fprintf(stderr, "Unknown id: %#x\n", id);
                 exit(-1);
         }
 
@@ -128,6 +136,7 @@ void parse_xid6( struct binary_file *spc ) {
     printf("Intro length: %#x\n", tags.intro_length );
     printf("Fade length: %d\n", tags.fade_length );
     printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
+    printf("OST track: %d %c\n", tags.ost_track >> 4, tags.ost_track & 0xFF );
     if ( tags.publishers_name != NULL ) {
         free( tags.publishers_name );
     }
