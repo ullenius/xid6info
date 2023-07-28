@@ -20,6 +20,8 @@ struct xid6 {
     char *game;
     char *artist;
     char *dumper;
+    uint32_t dumped_date;
+    uint8_t emulator;
     char *ost_title; // official soundtrack title
     uint8_t ost_disc;
     char *publishers_name;
@@ -53,6 +55,10 @@ void set_intro_length( struct xid6 *tags, const uint8_t *src) {
 
 void set_fade_length( struct xid6 *tags, const uint8_t *src) {
     tags->fade_length = parse_u32( src );
+}
+
+void set_dumped_date( struct xid6 *tags, const uint8_t *src) {
+    tags->dumped_date = parse_u32( src );
 }
 
 inline uint32_t parse_u32(const uint8_t *src) {
@@ -89,6 +95,15 @@ void parse_xid6( struct binary_file *spc ) {
                 break;
             case 0x4:
                 tags.dumper = allocate_copy( &spc->data[ offset ], val );
+                break;
+            case 0x5:
+                set_dumped_date( &tags, &spc->data[ offset ] );
+                break;
+            case 0x6:
+                tags.emulator = val & 0xFF;
+                break;
+            case 0x7:
+                tags.comments = allocate_copy( &spc->data[ offset ], val );
                 break;
             case 0x10:
                 tags.ost_title = allocate_copy( &spc->data[ offset ], val );
@@ -134,9 +149,17 @@ void parse_xid6( struct binary_file *spc ) {
     }
 
     printf("Game name: %s\n", tags.game ? tags.game : "" );
-    printf("Artist: %s\n", tags.artist ? tags.artist : "" );
     printf("Song name: %s\n", tags.song ? tags.song : "" );
+    printf("Artist: %s\n", tags.artist ? tags.artist : "" );
+    printf("Dumped by: %s\n", tags.dumper ? tags.dumper : "" );
+    if ( tags.dumped_date ) {
+        printf("Date song was dumped: %d\n", tags.dumped_date );
+    }
+    if ( tags.emulator ) {
+        printf("Emulator: %d\n", tags.emulator );
+    }
     printf("Copyright year: %d\n", tags.copyright_year );
+    printf("Comments: %s\n", tags.comments ? tags.comments : "" );
     printf("Official Soundtrack Title: %s\n", tags.ost_title );
     if (tags.ost_disc) {
         printf("OST disc: %d\n", tags.ost_disc );
@@ -161,12 +184,15 @@ void parse_xid6( struct binary_file *spc ) {
     if ( tags.song ) {
         free( tags.song );
     }
-    if ( tags.dumper) {
+    if ( tags.dumper ) {
         free( tags.dumper );
+    }
+    if ( tags.comments ) {
+        free ( tags.comments );
     }
     if ( tags.ost_title ) {
         free( tags.ost_title );
-    }   
+    }
 }
 
 struct binary_file *read_file(FILE *file) {
