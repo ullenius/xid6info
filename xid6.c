@@ -10,8 +10,6 @@
 #define XID6_OFFSET         0x10200
 #define FADE_LENGTH         4
 
-#define TEST_SPC            ("./unused.spc")
-
 struct xid6 {
     uint16_t copyright_year;
     uint32_t intro_length;
@@ -122,8 +120,15 @@ void parse_xid6( struct binary_file *spc ) {
             offset += val + padding;
         }
     }
+
+    printf("Game name: %s\n", tags.game ? tags.game : "" );
+    printf("Song name: %s\n", tags.song ? tags.song : "" );
+    printf("Copyright year: %d\n", tags.copyright_year );
+    printf("Publishers name: %s\n", tags.publishers_name );
+    printf("Intro length: %#x\n", tags.intro_length );
+    printf("Fade length: %d\n", tags.fade_length );
+    printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
     if ( tags.publishers_name != NULL ) {
-        printf("publishers name: %s\n", tags.publishers_name );
         free( tags.publishers_name );
     }
     if ( tags.artist != NULL) {
@@ -133,12 +138,6 @@ void parse_xid6( struct binary_file *spc ) {
     if ( tags.game ) {
         free( tags.game );
     }
-    printf("Game name: %s\n", tags.game ? tags.game : "" );
-    printf("Song name: %s\n", tags.song ? tags.song : "" );
-    printf("Copyright year: %d\n", tags.copyright_year );
-    printf("Intro length: %#x\n", tags.intro_length );
-    printf("Fade length: %d\n", tags.fade_length );
-    printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
 }
 
 struct binary_file *read_file(FILE *file) {
@@ -157,8 +156,12 @@ struct binary_file *read_file(FILE *file) {
     return bin;
 }
 
-int main() {
-    FILE *file= fopen(TEST_SPC, "rb");
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: xid6 file.spc\n");
+        return -1;
+    }
+    FILE *file= fopen(argv[1], "rb");
     if (file == NULL) {
         fprintf(stderr, "Cannot open file\n");
         return -1;
