@@ -10,11 +10,15 @@
 #define XID6_OFFSET         0x10200
 #define FADE_LENGTH         4
 
+#define TEST_SPC            ("./unused.spc")
+
 struct xid6 {
     uint16_t copyright_year;
     uint32_t intro_length;
     uint32_t fade_length;
+    uint8_t number_of_times_to_loop;
     char *publishers_name;
+    char *artist;
 };
 
 uint32_t parse_u32(const uint8_t*);
@@ -70,11 +74,14 @@ void parse_xid6( struct binary_file *spc ) {
     	val |= spc->data[offset++] << 8;           
 
         switch (id) {
-            case 0x14:
-                tags.copyright_year = val;
+            case 0x3:
+                tags.artist = allocate_copy( &spc->data[ offset ], val );
                 break;
             case 0x13:
                 tags.publishers_name = allocate_copy( &spc->data[ offset ], val ); 
+                break;
+            case 0x14:
+                tags.copyright_year = val;
                 break;
             case 0x30:
                 set_intro_length( &tags, &spc->data[ offset ] );
@@ -83,6 +90,9 @@ void parse_xid6( struct binary_file *spc ) {
                 set_fade_length( &tags, &spc->data[ offset ] );
                 offset += FADE_LENGTH;
                 break;
+            case 0x35:
+                tags.number_of_times_to_loop = val;
+                break;
         }
 
         if ( type == 0 ) {
@@ -90,7 +100,7 @@ void parse_xid6( struct binary_file *spc ) {
         } else {
             printf("increase offset by: %d\n", val);
             // 4-byte alignment of data
-            uint8_t padding = 4 - ( (val % 8) ); // sub-chunk header is 4 bytes
+            uint8_t padding = (4 - (val % 4) ) % 4; // sub-chunk header is 4 bytes
             if (padding) {
                 printf("extra padding: %d bytes\n", padding);
             }
@@ -101,8 +111,13 @@ void parse_xid6( struct binary_file *spc ) {
         printf("publishers name: %s\n", tags.publishers_name );
         free( tags.publishers_name );
     }
+    if ( tags.artist != NULL) {
+        printf("artist: %s\n", tags.artist);
+        free( tags.artist);
+    }
     printf("Intro length: %#x\n", tags.intro_length );
     printf("Fade length: %d\n", tags.fade_length );
+    printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
 }
 
 struct binary_file *read_file(FILE *file) {
@@ -122,7 +137,7 @@ struct binary_file *read_file(FILE *file) {
 }
 
 int main() {
-    FILE *file= fopen("./fortuna.spc", "rb");
+    FILE *file= fopen(TEST_SPC, "rb");
     if (file == NULL) {
         fprintf(stderr, "Cannot open file\n");
         return -1;
