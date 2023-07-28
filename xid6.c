@@ -22,6 +22,7 @@ struct xid6 {
     char *dumper;
     uint32_t dumped_date;
     uint8_t emulator;
+    char *comments;
     char *ost_title; // official soundtrack title
     uint8_t ost_disc;
     char *publishers_name;
@@ -44,6 +45,10 @@ int valid_xid6( struct binary_file *file ) {
 }
 
 void *allocate_copy (const uint8_t *src, size_t len) {
+    if (len < 4 || len > 256) {
+        fprintf(stderr, "Length must be between 4-256\n");
+        exit(-1);
+    }
     uint8_t *buf = malloc ( len );
     memcpy (buf, src, len );
     return buf;
@@ -160,7 +165,9 @@ void parse_xid6( struct binary_file *spc ) {
     }
     printf("Copyright year: %d\n", tags.copyright_year );
     printf("Comments: %s\n", tags.comments ? tags.comments : "" );
-    printf("Official Soundtrack Title: %s\n", tags.ost_title );
+    if (tags.ost_title) {
+            printf("Official Soundtrack Title: %s\n", tags.ost_title );
+    }
     if (tags.ost_disc) {
         printf("OST disc: %d\n", tags.ost_disc );
     }
