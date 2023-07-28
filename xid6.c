@@ -173,7 +173,6 @@ void parse_xid6( struct binary_file *spc ) {
     if ( tags.emulator ) {
         printf("Emulator: %d\n", tags.emulator );
     }
-    printf("Copyright year: %d\n", tags.copyright_year );
     printf("Comments: %s\n", tags.comments ? tags.comments : "" );
     if (tags.ost_title) {
             printf("Official Soundtrack Title: %s\n", tags.ost_title );
@@ -182,12 +181,17 @@ void parse_xid6( struct binary_file *spc ) {
         printf("OST disc: %d\n", tags.ost_disc );
     }
     printf("Publishers name: %s\n", tags.publishers_name );
+    printf("Copyright year: %d\n", tags.copyright_year );
     printf("Intro length: %#x\n", tags.intro_length );
+    printf("Loop length: %d\n", tags.loop_length );
+    printf("End length: %d\n", tags.end_length );
     printf("Fade length: %d\n", tags.fade_length );
+    printf("Muted voices: %#x\n", tags.muted_voices );
     printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
     if (tags.ost_track) {
         printf("OST track: %d %c\n", tags.ost_track >> 8, tags.ost_track & 0xFF );
     }
+    printf("Mixing (preamp) level: %#x\n", tags.mixing_level );
 
     if ( tags.publishers_name ) {
         free( tags.publishers_name );
