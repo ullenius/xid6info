@@ -20,6 +20,8 @@ struct xid6 {
     char *game;
     char *artist;
     char *dumper;
+    char *ost_title; // official soundtrack title
+    uint8_t ost_disc;
     char *publishers_name;
 };
 
@@ -92,6 +94,12 @@ void parse_xid6( struct binary_file *spc ) {
             case 0x4:
                 tags.dumper = allocate_copy( &spc->data[ offset ], val );
                 break;
+            case 0x10:
+                tags.ost_title = allocate_copy( &spc->data[ offset ], val );
+                break;
+            case 0x11:
+                tags.ost_disc = val;
+                break;
             case 0x12:
                 set_ost_track( &tags, &spc->data[ offset ] );
                 break;
@@ -130,23 +138,39 @@ void parse_xid6( struct binary_file *spc ) {
     }
 
     printf("Game name: %s\n", tags.game ? tags.game : "" );
+    printf("Artist: %s\n", tags.artist ? tags.artist : "" );
     printf("Song name: %s\n", tags.song ? tags.song : "" );
     printf("Copyright year: %d\n", tags.copyright_year );
+    printf("Official Soundtrack Title: %s\n", tags.ost_title );
+    if (tags.ost_disc) {
+        printf("OST disc: %d\n", tags.ost_disc );
+    }
     printf("Publishers name: %s\n", tags.publishers_name );
     printf("Intro length: %#x\n", tags.intro_length );
     printf("Fade length: %d\n", tags.fade_length );
     printf("Number of times to loop: %d\n", tags.number_of_times_to_loop );
-    printf("OST track: %d %c\n", tags.ost_track >> 4, tags.ost_track & 0xFF );
-    if ( tags.publishers_name != NULL ) {
+    if (tags.ost_track) {
+        printf("OST track: %d %c\n", tags.ost_track >> 4, tags.ost_track & 0xFF );
+    }
+
+    if ( tags.publishers_name ) {
         free( tags.publishers_name );
     }
-    if ( tags.artist != NULL) {
-        printf("artist: %s\n", tags.artist);
+    if ( tags.artist ) {
         free( tags.artist);
     }
     if ( tags.game ) {
         free( tags.game );
     }
+    if ( tags.song ) {
+        free( tags.song );
+    }
+    if ( tags.dumper) {
+        free( tags.dumper );
+    }
+    if ( tags.ost_title ) {
+        free( tags.ost_title );
+    }   
 }
 
 struct binary_file *read_file(FILE *file) {
