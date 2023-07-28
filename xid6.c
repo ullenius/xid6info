@@ -8,12 +8,16 @@
 #define XID6_HEADER_MAGIC   ("xid6")
 #define XID6_HEADER_LENGTH  8 // magic + length
 #define XID6_OFFSET         0x10200
+#define FADE_LENGTH         4
 
 struct xid6 {
     uint16_t copyright_year;
     uint32_t intro_length;
+    uint32_t fade_length;
     char *publishers_name;
 };
+
+uint32_t parse_u32(const uint8_t*);
 
 int valid_spc(struct binary_file *file) {
     if (file->size < HEADER_SIZE) {
@@ -35,8 +39,16 @@ void *allocate_copy (const uint8_t *src, size_t len) {
     return buf;
 }
 
-void set_intro_length( struct xid6 *tags, uint8_t *src) {
-    tags->intro_length = src[0] | src[1] << 8 | src[2] << 16 | src[3] << 24;
+void set_intro_length( struct xid6 *tags, const uint8_t *src) {
+    tags->intro_length = parse_u32( src );
+}
+
+void set_fade_length( struct xid6 *tags, const uint8_t *src) {
+    tags->fade_length = parse_u32( src );
+}
+
+inline uint32_t parse_u32(const uint8_t *src) {
+    return src[0] | src[1] << 8 | src[2] << 16 | src[3] << 24;
 }
 
 void parse_xid6( struct binary_file *spc ) {
@@ -67,28 +79,30 @@ void parse_xid6( struct binary_file *spc ) {
             case 0x30:
                 set_intro_length( &tags, &spc->data[ offset ] );
                 break;
+            case 0x33:
+                set_fade_length( &tags, &spc->data[ offset ] );
+                offset += FADE_LENGTH;
+                break;
         }
 
         if ( type == 0 ) {
-            printf("val stored in header: %d\n", val);
+            printf("val stored in sub-chunk header: %d\n", val);
         } else {
             printf("increase offset by: %d\n", val);
             // 4-byte alignment of data
-            uint8_t padding = 4 - ( (val % 8) );
+            uint8_t padding = 4 - ( (val % 8) ); // sub-chunk header is 4 bytes
             if (padding) {
                 printf("extra padding: %d bytes\n", padding);
             }
             offset += val + padding;
-
         }
     }
     if ( tags.publishers_name != NULL ) {
         printf("publishers name: %s\n", tags.publishers_name );
         free( tags.publishers_name );
     }
-    if ( tags.intro_length ) {
-        printf("Intro length: %#x\n", tags.intro_length );
-    }
+    printf("Intro length: %#x\n", tags.intro_length );
+    printf("Fade length: %d\n", tags.fade_length );
 }
 
 struct binary_file *read_file(FILE *file) {
