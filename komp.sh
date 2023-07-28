@@ -1,2 +1,2 @@
 #!/bin/sh
-cc -Wall -Wextra -pedantic $@ -o test
+cc -Wall -Wextra -Wpointer-arith -pedantic xid6.c -o xid6info
