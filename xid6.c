@@ -20,7 +20,7 @@ struct xid6 {
     char        *ost_title; // official soundtrack title
     uint8_t     ost_disc;
     uint16_t    ost_track;
-    char        *publishers_name;
+    char        *publisher;
     uint16_t    copyright_year;
     uint32_t    intro_length;
     uint32_t    loop_length;
@@ -111,46 +111,43 @@ void parse_xid6( struct binary_file *spc ) {
 
         switch (id) {
             case 0x1:
-                tags.song = allocate_copy( &spc->data[ offset ], val ); break;
+                tags.song = allocate_copy( &spc->data[ offset ], val );   break;
             case 0x2:
-                tags.game = allocate_copy( &spc->data[ offset ], val ); break;
+                tags.game = allocate_copy( &spc->data[ offset ], val );   break;
             case 0x3:
                 tags.artist = allocate_copy( &spc->data[ offset ], val ); break;
             case 0x4:
                 tags.dumper = allocate_copy( &spc->data[ offset ], val ); break;
             case 0x5:
-                set_dumped_date( &tags, &spc->data[ offset ] ); break;
+                set_dumped_date( &tags, &spc->data[ offset ] );           break;
             case 0x6:
-                tags.emulator = val & 0xFF; break;
+                tags.emulator = val & 0xFF;                               break;
             case 0x7:
-                tags.comments = allocate_copy( &spc->data[ offset ], val );
-                break;
+                tags.comments = allocate_copy(&spc->data[ offset ], val); break;
             case 0x10:
-                tags.ost_title = allocate_copy( &spc->data[ offset ], val );
-                break;
+                tags.ost_title = allocate_copy(&spc->data[offset ], val); break;
             case 0x11:
-                tags.ost_disc = val; break;
+                tags.ost_disc = val;                                      break;
             case 0x12:
-                tags.ost_track = val; break;
+                tags.ost_track = val;                                     break;
             case 0x13:
-                tags.publishers_name = allocate_copy( &spc->data[ offset ], val ); 
-                break;
+                tags.publisher = allocate_copy( &spc->data[offset], val); break;
             case 0x14:
-                tags.copyright_year = val; break;
+                tags.copyright_year = val;                                break;
             case 0x30:
-                set_intro_length( &tags, &spc->data[ offset ] ); break;
+                tags.intro_length = parse_u32( &spc->data[ offset ] );    break;
             case 0x31:
-                set_loop_length( &tags, &spc->data[ offset ] ); break;
+                tags.loop_length =  parse_u32( &spc->data[ offset ] );    break;
             case 0x32:
-                set_end_length( &tags, &spc->data[ offset ] ); break;
+                tags.end_length = parse_u32( &spc->data[ offset ] );      break;
             case 0x33:
-                set_fade_length( &tags, &spc->data[ offset ] ); break;
+                tags.fade_length = parse_u32( &spc->data[ offset ] );     break;
             case 0x34:
-                tags.muted_voices = val & 0xFF; break;
+                tags.muted_voices = val & 0xFF;                           break;
             case 0x35:
-                tags.number_of_times_to_loop = val & 0xFF; break;
+                tags.number_of_times_to_loop = val & 0xFF;                break;
             case 0x36:
-                set_mixing_level( &tags, &spc->data[ offset ] ); break;
+                tags.mixing_level = parse_u32( &spc->data[ offset ] );    break;
             default:
                 fprintf(stderr, "Unknown id: %#x\n", id);
                 exit(-1);
@@ -179,7 +176,7 @@ void parse_xid6( struct binary_file *spc ) {
     if (tags.ost_disc) {
         printf("OST disc: %d\n", tags.ost_disc );
     }
-    printf("Publishers name:       %s\n",       tags.publishers_name );
+    printf("Publishers name:       %s\n",       tags.publisher );
     printf("Copyright year:        %d\n",       tags.copyright_year );
     printf("Intro length:          %#4x\n",     tags.intro_length );
     printf("Loop length:           %d\n",       tags.loop_length );
@@ -195,7 +192,7 @@ void parse_xid6( struct binary_file *spc ) {
     }
     printf("Mixing (preamp) level: %#04x\n",    tags.mixing_level );
 
-    free_ifpresent( tags.publishers_name );
+    free_ifpresent( tags.publisher );
     free_ifpresent( tags.artist );
     free_ifpresent( tags.game );
     free_ifpresent( tags.song );
