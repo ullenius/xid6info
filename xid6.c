@@ -224,6 +224,12 @@ int main(int argc, char **argv) {
         return -1;
     }
     struct binary_file *spc = read_file( file );
+    if ( fclose( file ) != 0 ) {
+        fprintf(stderr, "Error closing file\n");
+        free ( spc->data );
+        free ( spc );
+        return -1;
+    };
     if ( !valid_spc ( spc ) ) {
         fprintf(stderr, "Not a valid SPC file\n");
         free( spc->data );
