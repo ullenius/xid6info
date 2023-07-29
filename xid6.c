@@ -154,7 +154,7 @@ void parse_xid6( struct binary_file *spc ) {
     if (tags.ost_disc)
         printf("OST disc : %d\n",                  tags.ost_disc );
     if (tags.publisher)
-        printf("Publishers name : %s\n",           tags.publisher );
+        printf("Publisher : %s\n",                 tags.publisher );
     if (tags.copyright_year)
         printf("Copyright year : %d\n",            tags.copyright_year );
     if (tags.intro_length)
@@ -171,11 +171,9 @@ void parse_xid6( struct binary_file *spc ) {
         printf("\n");
     }
     if (tags.number_of_times_to_loop)
-        printf("No. times to loop : %d\n",         tags.number_of_times_to_loop );
-    if (tags.ost_track) {
-        printf("OST track : %d %c\n",              tags.ost_track >> 8,
-            tags.ost_track & 0xFF );
-    }
+        printf("No. times to loop : %d\n", tags.number_of_times_to_loop );
+    if (tags.ost_track)
+        printf("OST track : %d %c\n", tags.ost_track >> 8, tags.ost_track & 0xFF);
     if (tags.mixing_level)
         printf("Mixing (preamp) level : %#04x\n",  tags.mixing_level );
 
