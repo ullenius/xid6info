@@ -57,30 +57,6 @@ void *allocate_copy (const uint8_t *src, size_t len) {
     return buf;
 }
 
-void set_intro_length( struct xid6 *tags, const uint8_t *src ) {
-    tags->intro_length = parse_u32( src );
-}
-
-void set_fade_length( struct xid6 *tags, const uint8_t *src ) {
-    tags->fade_length = parse_u32( src );
-}
-
-void set_dumped_date( struct xid6 *tags, const uint8_t *src ) {
-    tags->dumped_date = parse_u32( src );
-}
-
-void set_loop_length( struct xid6 *tags, const uint8_t *src ) {
-    tags->loop_length = parse_u32( src );
-}
-
-void set_end_length( struct xid6 *tags, const uint8_t *src ) {
-    tags->end_length = parse_u32( src );
-}
-
-void set_mixing_level( struct xid6 *tags, const uint8_t *src ) {
-    tags->mixing_level = parse_u32( src );
-}
-
 inline uint32_t parse_u32(const uint8_t *src) {
     return src[0] | src[1] << 8 | src[2] << 16 | src[3] << 24;
 }
@@ -119,7 +95,7 @@ void parse_xid6( struct binary_file *spc ) {
             case 0x4:
                 tags.dumper = allocate_copy( &spc->data[ offset ], val ); break;
             case 0x5:
-                set_dumped_date( &tags, &spc->data[ offset ] );           break;
+                tags.dumped_date = parse_u32( &spc->data[ offset ] );     break;
             case 0x6:
                 tags.emulator = val & 0xFF;                               break;
             case 0x7:
