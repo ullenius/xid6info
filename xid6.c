@@ -91,6 +91,12 @@ void free_ifpresent( void *target ) {
     }
 }
 
+void printBits(uint8_t val) {
+    for (int i = 7; i >= 0; i--) {
+        printf("%d", ( (1 << i) & val) != 0 );
+    }
+}
+
 void parse_xid6( struct binary_file *spc ) {
     struct xid6 tags = { 0 };
     uint8_t *len = &spc->data[ XID6_OFFSET + 4 ];
@@ -179,8 +185,9 @@ void parse_xid6( struct binary_file *spc ) {
     printf("Loop length:           %d\n",       tags.loop_length );
     printf("End length:            %d\n",       tags.end_length );
     printf("Fade length:           %d\n",       tags.fade_length );
-    // TODO print bits
-    printf("Muted voices:          %#02x\n",    tags.muted_voices );
+    printf("Muted voices : ");
+    printBits( tags.muted_voices );
+    printf("\n");
     printf("No. times to loop:     %d\n",       tags.number_of_times_to_loop );
     if (tags.ost_track) {
         printf("OST track:         %d %c\n",    tags.ost_track >> 8,
@@ -200,7 +207,7 @@ void parse_xid6( struct binary_file *spc ) {
 struct binary_file *read_file(FILE *file) {
     fseek( file, 0, SEEK_SET );
     fseek( file, 0, SEEK_END );
-    size_t size = ftell( file );
+    const size_t size = ftell( file );
     
     struct binary_file *bin = malloc( sizeof(struct binary_file) );
     bin->size = size;
