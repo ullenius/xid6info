@@ -159,38 +159,49 @@ void parse_xid6( struct binary_file *spc ) {
         }
     }
 
-    printf("Game name: %s\n", tags.game ? tags.game : "" );
-    printf("Song name: %s\n", tags.song ? tags.song : "" );
-    printf("Artist: %s\n", tags.artist ? tags.artist : "" );
-    printf("Dumped by: %s\n", tags.dumper ? tags.dumper : "" );
-    if ( tags.dumped_date ) {
-        printf("Date song was dumped: %d\n", tags.dumped_date );
+    if (tags.game)
+        printf("Game name : %s\n",                 tags.game );
+    if (tags.song)
+        printf("Song name : %s\n",                 tags.song );
+    if (tags.artist)
+        printf("Artist : %s\n",                    tags.artist );
+    if (tags.dumper)
+        printf("Dumped by : %s\n",                 tags.dumper );
+    if ( tags.dumped_date )
+        printf("Date song was dumped : %d\n",      tags.dumped_date );
+    if ( tags.emulator )
+        printf("Emulator : %d\n",                  tags.emulator );
+    if (tags.comments)
+    printf("Comments : %s\n",                      tags.comments );
+    if (tags.ost_title)
+        printf("Official Soundtrack Title : %s\n", tags.ost_title );
+    if (tags.ost_disc)
+        printf("OST disc : %d\n",                  tags.ost_disc );
+    if (tags.publisher)
+        printf("Publishers name : %s\n",           tags.publisher );
+    if (tags.copyright_year)
+        printf("Copyright year : %d\n",            tags.copyright_year );
+    if (tags.intro_length)
+        printf("Intro length : %#4x\n",            tags.intro_length );
+    if (tags.loop_length)
+        printf("Loop length : %d\n",               tags.loop_length );
+    if (tags.end_length)
+        printf("End length : %d\n",                tags.end_length );
+    if (tags.fade_length)
+        printf("Fade length : %d\n",               tags.fade_length );
+    if (tags.muted_voices) {
+        printf("Muted voices : ");
+        printBits( tags.muted_voices );
+        printf("\n");
     }
-    if ( tags.emulator ) {
-        printf("Emulator: %d\n", tags.emulator );
-    }
-    printf("Comments: %s\n", tags.comments ? tags.comments : "" );
-    if (tags.ost_title) {
-            printf("Official Soundtrack Title: %s\n", tags.ost_title );
-    }
-    if (tags.ost_disc) {
-        printf("OST disc: %d\n", tags.ost_disc );
-    }
-    printf("Publishers name:       %s\n",       tags.publisher );
-    printf("Copyright year:        %d\n",       tags.copyright_year );
-    printf("Intro length:          %#4x\n",     tags.intro_length );
-    printf("Loop length:           %d\n",       tags.loop_length );
-    printf("End length:            %d\n",       tags.end_length );
-    printf("Fade length:           %d\n",       tags.fade_length );
-    printf("Muted voices : ");
-    printBits( tags.muted_voices );
-    printf("\n");
-    printf("No. times to loop:     %d\n",       tags.number_of_times_to_loop );
+    if (tags.number_of_times_to_loop)
+        printf("No. times to loop : %d\n",         tags.number_of_times_to_loop );
     if (tags.ost_track) {
-        printf("OST track:         %d %c\n",    tags.ost_track >> 8,
+        printf("OST track : %d %c\n",              tags.ost_track >> 8,
             tags.ost_track & 0xFF );
     }
-    printf("Mixing (preamp) level: %#04x\n",    tags.mixing_level );
+    if (tags.mixing_level)
+        printf("Mixing (preamp) level : %#04x\n",  tags.mixing_level );
 
     free_ifpresent( tags.publisher );
     free_ifpresent( tags.artist );
