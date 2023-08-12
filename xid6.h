@@ -21,7 +21,7 @@ struct xid6 {
     uint32_t    dumped_date;
     uint32_t    intro_length;
     uint32_t    loop_length;
-    uint32_t    end_length;
+    int32_t     end_length;
     uint32_t    fade_length;
     uint32_t    mixing_level;
     uint16_t    copyright_year;
