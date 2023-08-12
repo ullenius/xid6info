@@ -9,6 +9,9 @@
 #define XID6_HEADER_LENGTH  8 // magic + length
 #define XID6_OFFSET         0x10200
 
+#define MIN_STRING_LEN      4
+#define MAX_STRING_LEN      256
+
 int valid_spc(struct binary_file *file) {
     if (file->size < HEADER_SIZE) {
         return 0;
@@ -23,13 +26,17 @@ int valid_xid6( struct binary_file *file ) {
     return memcmp( &file->data[ XID6_OFFSET ], XID6_HEADER_MAGIC, 4 ) == 0;
 }
 
-void *allocate_copy (const uint8_t *src, size_t len) {
-    if (len < 4 || len > 256) {
+void *allocate_copy (const uint8_t *src, const size_t len) {
+    if (len < MIN_STRING_LEN || len > MAX_STRING_LEN) {
         fprintf(stderr, "Length must be between 4-256\n");
         exit(-1);
     }
-    uint8_t *buf = malloc ( len );
+    const int add_null = src[len - 1] != '\0';
+    uint8_t *buf = malloc ( len + add_null );
     memcpy (buf, src, len );
+    if (add_null) {
+        buf[len] = '\0';
+    }
     return buf;
 }
 
