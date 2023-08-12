@@ -33,6 +33,22 @@ void *allocate_copy (const uint8_t *src, size_t len) {
     return buf;
 }
 
+// validates OST track (track no and optional ASCII char
+// returns valid OST track (2-parts)
+// zeroes invalid part(s) (some SPCs are broken)
+uint16_t cleanup_ost_track(const uint16_t track) {
+    uint8_t no = track >> 8;
+    if (no > 99) { // valid track numbers 0-99
+        no = 0;
+    }
+    uint8_t ch = track & 0xFF;
+    const int is_ascii = (ch > 32 && ch < 127);
+    if ( !is_ascii ) {
+        ch = 0;
+    }
+    return ( no << 8 ) | ch;
+}
+
 inline uint32_t parse_u32(const uint8_t *src) {
     return src[0] | src[1] << 8 | src[2] << 16 | src[3] << 24;
 }
@@ -81,7 +97,7 @@ void parse_xid6( struct binary_file *spc ) {
             case 0x11:
                 tags.ost.disc = val;                                      break;
             case 0x12:
-                tags.ost.track = val;                                     break;
+                tags.ost.track = cleanup_ost_track( val );                break;
             case 0x13:
                 tags.publisher = allocate_copy( &spc->data[offset], val); break;
             case 0x14:
