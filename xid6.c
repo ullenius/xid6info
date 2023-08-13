@@ -40,7 +40,7 @@ void *allocate_copy (const uint8_t *src, const size_t len) {
     return buf;
 }
 
-// validates OST track (track no and optional ASCII char
+// validates OST track (track no and optional ASCII char)
 // returns valid OST track (2-parts)
 // zeroes invalid part(s) (some SPCs are broken)
 uint16_t cleanup_ost_track(const uint16_t track) {
@@ -74,15 +74,17 @@ void printBits(uint8_t val) {
 
 void parse_xid6( struct binary_file *spc ) {
     struct xid6 tags = { .ost = { 0 } };
-    uint8_t *len = &spc->data[ XID6_OFFSET + 4 ];
+    const uint8_t *len = &spc->data[ XID6_OFFSET + 4 ];
     const uint32_t chunk_size = len[0] | len[1] << 8 | len[2] << 16 | len[3] << 24;
 
     size_t offset = XID6_OFFSET + XID6_HEADER_LENGTH;
     while ( offset < ( XID6_OFFSET + XID6_HEADER_LENGTH + chunk_size) ) {
         uint8_t id = spc->data[ offset++ ];
         uint8_t type = spc->data[ offset++ ];
-    	uint16_t val = spc->data[ offset++];
-    	val |= spc->data[offset++] << 8;           
+
+        // if stored *after* the sub-chunk header, this contains the length
+    	uint16_t val = spc->data[ offset++ ];
+    	val |= spc->data[ offset++ ] << 8;
 
         switch (id) {
             case 0x1:
@@ -127,7 +129,7 @@ void parse_xid6( struct binary_file *spc ) {
                 fprintf(stderr, "Unknown id: %#x\n", id);
                 exit(-1);
         }
-        if ( type ) { // value stored in sub-chunk header
+        if ( type ) { // value stored after sub-chunk header
             // 4-byte alignment of data
             uint8_t padding = (4 - (val % 4) ) % 4; // sub-chunk header is 4 bytes
             offset += val + padding; // TODO use hard-coded values ?
