@@ -1,3 +1,22 @@
+/* xid6info
+ * Copyright (C) 2023 Anosh D. Ullenius
+ *
+ * GPL-3.0-only
+ *
+ * This file is part of xid6info
+ *
+ * xid6info is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation version 3.0.
+ *
+ * xid6info is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -131,8 +150,8 @@ void parse_xid6( struct binary_file *spc ) {
         }
         if ( type ) { // value stored after sub-chunk header
             // 4-byte alignment of data
-            uint8_t padding = (4 - (val % 4) ) % 4; // sub-chunk header is 4 bytes
-            offset += val + padding; // TODO use hard-coded values ?
+            uint8_t padding = (4 - (val % 4) ) % 4;
+            offset += val + padding;
         }
     }
 
