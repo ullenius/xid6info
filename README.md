@@ -1,4 +1,4 @@
-# xid6info : read extended tags from SPC-files (SNES Sound Files)
+# xid6info : read extended tags from SPC-files
 
 [xid6info](https://github.com/ullenius/xid6info) is stand-alone command line app
 for reading the extended tags (xid6) from SPC-files (music files for SNES/Super
@@ -15,6 +15,7 @@ usage: xid6info <filename>
 For example:
 ```sh
 $ xid6info "./ff-mystic-quest/26 - Mystic Ballad.spc"
+```
 ```
 Official Soundtrack Title : Final Fantasy USA Mystic Quest Sound Collections (N25D-020)
 OST disc : 1
