@@ -229,7 +229,7 @@ struct binary_file *read_file(FILE *file) {
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        fprintf(stderr, "Usage: xid6 file.spc\n");
+        fprintf(stderr, "Usage: xid6info file.spc\n");
         return -1;
     }
     FILE *file= fopen(argv[1], "rb");
